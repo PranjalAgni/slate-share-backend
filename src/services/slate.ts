@@ -8,15 +8,19 @@ import {
   INIT_TEXT,
   INIT_TEXT_REQUEST
 } from "../constants/types";
+import Cache from "../cache";
 
 export class SlateServer {
   private server: Server;
   private io: socketio.Server;
   private text: Record<string, unknown>;
+  private readonly cache: Cache;
 
   constructor(server: Server) {
     this.server = server;
     this.initSocket();
+    // Keep cache for 1D
+    this.cache = new Cache(60 * 60 * 24);
     this.text = {
       document: {
         nodes: [
@@ -42,13 +46,16 @@ export class SlateServer {
 
   startSlateServer(): void {
     this.io.on(ON_CONNECTION, (socket: Socket) => {
-      socket.on(INIT_TEXT_REQUEST, () => {
-        this.io.emit(INIT_TEXT, this.text);
+      socket.on(INIT_TEXT_REQUEST, (data) => {
+        const textVal = this.cache.get(data.key, this.text);
+        this.io.emit(INIT_TEXT, textVal);
       });
 
       socket.on(EDITOR_OPERATIONS, (data: IEditorData) => {
-        this.text = data.editorText;
-        this.io.emit(REMOTE_EDITOR_OPERATIONS, data);
+        const { groupId } = data;
+        const REMOTE_EDITOR_OPERATIONS_GROUPID = `${REMOTE_EDITOR_OPERATIONS}_${groupId}`;
+        this.cache.set(groupId, data.editorText);
+        this.io.emit(REMOTE_EDITOR_OPERATIONS_GROUPID, data);
       });
     });
   }

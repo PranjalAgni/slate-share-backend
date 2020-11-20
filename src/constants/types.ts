@@ -8,4 +8,5 @@ export interface IEditorData {
   editorId: string;
   operations: string;
   editorText: Record<string, unknown>;
+  groupId: string;
 }
