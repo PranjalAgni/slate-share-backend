@@ -3,7 +3,7 @@ services:
   slate-server:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: slate-server
     image: slate-server
     restart: unless-stopped
