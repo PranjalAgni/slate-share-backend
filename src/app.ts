@@ -4,9 +4,10 @@ import { SlateServer } from "./services/slate";
 import router from "./routes";
 
 const app = express();
-const server = http.createServer(app);
 
 app.use("/", router);
+
+const server = http.createServer(app);
 
 new SlateServer(server);
 

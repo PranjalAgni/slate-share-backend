@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
-import server from "./app";
+import httpServer from "./app";
 
-server.listen(process.env.PORT, () => {
+httpServer.listen(process.env.PORT, () => {
   console.log(
     "  App is running at http://localhost:%d in %s mode",
     process.env.PORT,
